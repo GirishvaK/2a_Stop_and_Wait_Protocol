@@ -12,64 +12,56 @@ To write a python program to perform stop and wait protocol
 Client.py
 ```
 import socket
-import time
 
-# Create socket
-client_socket = socket.socket()
-client_socket.connect(('localhost', 12345))
+c = socket.socket()
+c.connect(('localhost', 1234))
 
-n = int(input("Enter number of frames to send: "))
+frame_size = int(input("Enter number of frames: "))
 
-for i in range(1, n + 1):
-    frame = f"Frame {i}"
+for i in range(frame_size):
+    frame = f"Frame {i+1}"
     print("Sending:", frame)
-    client_socket.send(frame.encode())
+    c.send(frame.encode())
 
-    # Wait for ACK
-    ack = client_socket.recv(1024).decode()
+    ack = c.recv(1024).decode()
     print("Received:", ack)
-    time.sleep(1)
 
-client_socket.send("exit".encode())
-client_socket.close()
+c.send("END".encode())
+c.close()
 ```
 Server.py
 ```
 import socket
 
-# Create socket
-server_socket = socket.socket()
-server_socket.bind(('localhost', 12345))
-server_socket.listen(1)
+s = socket.socket()
+s.bind(('localhost', 1234))
+s.listen(1)
 
-print("Server is waiting for connection...")
-
-conn, addr = server_socket.accept()
-print("Connected to client:", addr)
+print("Server started, waiting for client...")
+conn, addr = s.accept()
+print("Connected with", addr)
 
 while True:
     frame = conn.recv(1024).decode()
-
-    if frame == "exit":
-        print("Transmission completed.")
+    if frame == "END":
+        print("Transmission completed")
         break
 
-    print("Received frame:", frame)
-
-    # Send ACK
-    ack = "ACK"
-    conn.send(ack.encode())
-    print("ACK sent\n")
+    print("Frame received:", frame)
+    conn.send("ACK".encode())
 
 conn.close()
-server_socket.close()
+s.close()
 ```
 ## OUTPUT
-Client.py
-<img width="1481" height="895" alt="543179607-21882f1a-27d0-4498-a458-ea173c333dba" src="https://github.com/user-attachments/assets/7b358122-0ccb-456a-8a5d-2e50daa7e340" />
+Client
 
-Server.py
-<img width="1486" height="937" alt="543179665-05b080ad-ccd9-4959-b981-f2240673f4b6" src="https://github.com/user-attachments/assets/cb02c389-91a8-46fc-893c-df7c944cf971" />
+<img width="594" height="280" alt="image" src="https://github.com/user-attachments/assets/3296db7c-fde4-46e4-a49e-9a3155be146f" />
+
+
+Server
+
+<img width="631" height="317" alt="image" src="https://github.com/user-attachments/assets/fe72d436-c384-4fe7-87e2-23d66ceef996" />
 
 
 ## RESULT
